@@ -1,0 +1,38 @@
+.filterContainer {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  flex: 1;
+  min-width: 160px;
+}
+
+.searchInput,
+.statusSelect {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.searchInput:focus,
+.statusSelect:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+@media (max-width: 640px) {
+  .filterContainer {
+    flex-direction: column;
+  }
+
+  .filterGroup {
+    min-width: unset;
+  }
+}

@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// User model for authentication
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  username  String     @unique
+  password  String     // Will be hashed with bcrypt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  
+  // Relations
+  tasks     Task[]
+  refreshTokens RefreshToken[]
+  taskActivities TaskActivity[]
+}
+
+// Task model for task management
+model Task {
+  id        String     @id @default(cuid())
+  title     String
+  description String?
+  status    TaskStatus @default(PENDING)  // PENDING, COMPLETED, ARCHIVED
+  priority  TaskPriority @default(MEDIUM)
+  dueDate   DateTime?
+  reminderAt DateTime?
+  recurrence RecurrencePattern @default(NONE)
+  recurrenceInterval Int?
+  completedAt DateTime?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  
+  // Foreign key
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activities TaskActivity[]
+  
+  @@index([userId])
+}
+
+// RefreshToken model for managing JWT refresh tokens
+model RefreshToken {
+  id        String     @id @default(cuid())
+  token     String     @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime   @default(now())
+  
+  // Foreign key
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+}
+
+model TaskActivity {
+  id        String   @id @default(cuid())
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+// Enum for task status
+enum TaskStatus {
+  PENDING
+  COMPLETED
+  ARCHIVED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum RecurrencePattern {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+}
